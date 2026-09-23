@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Async / Await Demo</title>
+  <style>
+    body { font-family: sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+    #output { padding: 1rem; background: #1e293b; border-radius: 6px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h2>Async / Await Demo (async-await.html)</h2>
+  <div id="output">Loading student... (Check Console or wait 3s)</div>
+
+  <script>
+    function getstudent() {
+      return new Promise(function(resolve) {
+        setTimeout(function() {
+          resolve("Arun");
+        }, 3000);
+      });
+    }
+
+    async function displaystudent() {
+      console.log("Loading student...");
+      let student = await getstudent();
+      console.log("Student loaded:", student);
+      document.getElementById("output").textContent = "Loaded Student: " + student;
+    }
+
+    displaystudent();
+  </script>
+</body>
+</html>

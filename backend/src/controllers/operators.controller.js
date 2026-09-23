@@ -57,17 +57,53 @@ const calculateComparison = (a, b) => {
   };
 };
 
+const calculateLogical = (a, b) => {
+  const numA = Number(a);
+  const numB = Number(b);
+  return {
+    andNegative: { expression: `(${numA} < 0 && ${numB} < 0)`, result: numA < 0 && numB < 0 },
+    orNegative: { expression: `(${numA} < 0 || ${numB} < 0)`, result: numA < 0 || numB < 0 },
+    notANegative: { expression: `!(${numA} < 0)`, result: !(numA < 0) },
+    andPositive: { expression: `(${numA} > 0 && ${numB} > 0)`, result: numA > 0 && numB > 0 },
+    orPositive: { expression: `(${numA} > 0 || ${numB} > 0)`, result: numA > 0 || numB > 0 },
+    notAPositive: { expression: `!(${numA} > 0)`, result: !(numA > 0) },
+  };
+};
+
+const calculateUnary = (initialA) => {
+  let val = Number(initialA);
+  const postInc = val++; // evaluates to old val, then increments
+  const postDec = val--; // evaluates to incremented, then decrements
+  const preInc = ++val;  // increments first
+  const preDec = --val;  // decrements first
+
+  return {
+    initial: Number(initialA),
+    postIncrement: { expression: `a++ (with a=${Number(initialA)})`, result: Number(initialA), finalA: Number(initialA) + 1 },
+    postDecrement: { expression: `a-- (after post-increment)`, result: Number(initialA) + 1, finalA: Number(initialA) },
+    preIncrement: { expression: `++a`, result: Number(initialA) + 1, finalA: Number(initialA) + 1 },
+    preDecrement: { expression: `--a`, result: Number(initialA), finalA: Number(initialA) },
+  };
+};
+
+const calculateTernary = (a, b) => {
+  const numA = Number(a);
+  const numB = Number(b);
+  const condition = numA > numB;
+  const result = condition ? 'a is greater ' : 'b is greater';
+  return {
+    expression: `(${numA} > ${numB}) ? "a is greater " : "b is greater"`,
+    condition,
+    result,
+  };
+};
+
 exports.getArithmetic = async (req, res) => {
   try {
-    const a = req.query.a !== undefined ? req.query.a : 30; // default from laddu/opreators.js
-    const b = req.query.b !== undefined ? req.query.b : 38; // default from laddu/opreators.js
+    const a = req.query.a !== undefined ? req.query.a : 30;
+    const b = req.query.b !== undefined ? req.query.b : 38;
     const results = calculateArithmetic(a, b);
-    res.json({
-      success: true,
-      category: 'arithmetic',
-      inputs: { a: Number(a), b: Number(b) },
-      results,
-    });
+    res.json({ success: true, category: 'arithmetic', inputs: { a: Number(a), b: Number(b) }, results });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -75,15 +111,10 @@ exports.getArithmetic = async (req, res) => {
 
 exports.getAssignment = async (req, res) => {
   try {
-    const a = req.query.a !== undefined ? req.query.a : 20; // default from laddu/opreators.js
-    const b = req.query.b !== undefined ? req.query.b : 39; // default from laddu/opreators.js
+    const a = req.query.a !== undefined ? req.query.a : 20;
+    const b = req.query.b !== undefined ? req.query.b : 39;
     const results = calculateAssignment(a, b);
-    res.json({
-      success: true,
-      category: 'assignment',
-      inputs: { a: Number(a), b: Number(b) },
-      results,
-    });
+    res.json({ success: true, category: 'assignment', inputs: { a: Number(a), b: Number(b) }, results });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -91,15 +122,42 @@ exports.getAssignment = async (req, res) => {
 
 exports.getComparison = async (req, res) => {
   try {
-    const a = req.query.a !== undefined ? req.query.a : 20; // default from laddu/opreators.js
-    const b = req.query.b !== undefined ? req.query.b : 40; // default from laddu/opreators.js
+    const a = req.query.a !== undefined ? req.query.a : 20;
+    const b = req.query.b !== undefined ? req.query.b : 40;
     const results = calculateComparison(a, b);
-    res.json({
-      success: true,
-      category: 'comparison',
-      inputs: { a, b },
-      results,
-    });
+    res.json({ success: true, category: 'comparison', inputs: { a, b }, results });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getLogical = async (req, res) => {
+  try {
+    const a = req.query.a !== undefined ? req.query.a : 20;
+    const b = req.query.b !== undefined ? req.query.b : 40;
+    const results = calculateLogical(a, b);
+    res.json({ success: true, category: 'logical', inputs: { a: Number(a), b: Number(b) }, results });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getUnary = async (req, res) => {
+  try {
+    const a = req.query.a !== undefined ? req.query.a : 10;
+    const results = calculateUnary(a);
+    res.json({ success: true, category: 'unary', inputs: { a: Number(a) }, results });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getTernary = async (req, res) => {
+  try {
+    const a = req.query.a !== undefined ? req.query.a : 12;
+    const b = req.query.b !== undefined ? req.query.b : 13;
+    const results = calculateTernary(a, b);
+    res.json({ success: true, category: 'ternary', inputs: { a: Number(a), b: Number(b) }, results });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -107,41 +165,45 @@ exports.getComparison = async (req, res) => {
 
 exports.runSourceDemo = async (req, res) => {
   try {
-    // 1. Arithmetic with a=30, b=38
-    const arithmeticSource = calculateArithmetic(30, 38);
-    // 2. Assignment with a=20, b=39
-    const assignmentSource = calculateAssignment(20, 39);
-    // 3. Comparison with a=20, b=40
-    const comparisonSource = calculateComparison(20, 40);
+    const arithmetic = calculateArithmetic(30, 38);
+    const assignment = calculateAssignment(20, 39);
+    const comparison = calculateComparison(20, 40);
+    const logical = calculateLogical(20, 40);
+    const unary = calculateUnary(10);
+    const ternary = calculateTernary(12, 13);
 
     const logOutputs = [
-      '// --- ARITHMETIC OPERATORS (a=30, b=38) ---',
-      `a + b = ${30 + 38}`,
-      `a - b = ${30 - 38}`,
-      `a * b = ${30 * 38}`,
-      `a / b = ${30 / 38}`,
-      `a ** b = ${30 ** 38}`,
-      `a % b = ${30 % 38}`,
-      '// --- ASSIGNMENT OPERATORS (a=20, b=39) ---',
-      `a += b -> ${20 + 39}`,
-      `a -= b -> ${20 - 39}`,
-      `a *= b -> ${20 * 39}`,
-      `a /= b -> ${20 / 39}`,
-      '// --- COMPARISON OPERATORS (a=20, b=40) ---',
-      `a == b -> ${20 == 40}`,
-      `a <= b -> ${20 <= 40}`,
-      `a >= b -> ${20 >= 40}`,
-      `a != b -> ${20 != 40}`,
+      '// --- ARITHMETIC (a=30, b=38) ---',
+      `30 + 38 = 68`,
+      `30 - 38 = -8`,
+      `30 * 38 = 1140`,
+      `30 / 38 = ${(30/38).toFixed(4)}`,
+      `30 ** 38 = ${(30**38).toExponential(3)}`,
+      `30 % 38 = 30`,
+      '// --- ASSIGNMENT (a=20, b=39) ---',
+      `a += b -> 59`,
+      `a -= b -> -19`,
+      `a *= b -> 780`,
+      `a /= b -> ${(20/39).toFixed(4)}`,
+      '// --- COMPARISON (a=20, b=40) ---',
+      `20 == 40 -> false`,
+      `20 <= 40 -> true`,
+      `20 >= 40 -> false`,
+      `20 != 40 -> true`,
+      '// --- LOGICAL (a=20, b=40) ---',
+      `20 > 0 && 40 > 0 -> true`,
+      `20 < 0 || 40 < 0 -> false`,
+      `!(20 > 0) -> false`,
+      '// --- UNARY (a=10) ---',
+      `a++ -> 10, a-- -> 11, ++a -> 11, --a -> 10`,
+      '// --- TERNARY (a=12, b=13) ---',
+      `(12 > 13) ? "a is greater " : "b is greater" -> "b is greater"`,
     ];
 
     res.json({
       success: true,
-      sourceOrigin: 'laddu/opreators.js (migrated & fixed)',
-      data: {
-        arithmetic: { inputs: { a: 30, b: 38 }, results: arithmeticSource },
-        assignment: { inputs: { a: 20, b: 39 }, results: assignmentSource },
-        comparison: { inputs: { a: 20, b: 40 }, results: comparisonSource },
-      },
+      sourceOrigin: 'laddu/opreators.js (full updated suite)',
+      data: { arithmetic, assignment, comparison, logical, unary, ternary },
       consoleLogs: logOutputs,
     });
   } catch (error) {

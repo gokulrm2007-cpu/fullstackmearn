@@ -22,8 +22,8 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'fullstackmearn-backend',
-    version: '1.0.0',
-    origin: 'Migrated from laddu repository',
+    version: '2.0.0',
+    origin: 'Migrated from laddu repository (Full suite with ES6, async/await, loops, datatypes)',
     database: getDBStatus(),
     timestamp: new Date().toISOString(),
   });
@@ -32,6 +32,9 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/operators', require('./routes/operators.routes'));
 app.use('/api/variables', require('./routes/variables.routes'));
+app.use('/api/datatypes', require('./routes/datatypes.routes'));
+app.use('/api/loops', require('./routes/loops.routes'));
+app.use('/api/students', require('./routes/students.routes'));
 
 // 404 Handler for API
 app.use((req, res, next) => {
@@ -54,8 +57,6 @@ if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`[Express] Server running on http://localhost:${PORT}`);
     console.log(`[Express] Health check: http://localhost:${PORT}/api/health`);
-    console.log(`[Express] Operators API: http://localhost:${PORT}/api/operators/demo`);
-    console.log(`[Express] Variables API: http://localhost:${PORT}/api/variables`);
   });
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, Play, Server, Clock, Check, ArrowRight } from 'lucide-react';
+import { Calculator, Play, Plus, Zap, Check } from 'lucide-react';
 
 export default function OperatorsDemo({ onLogMessage }) {
   // Source default values from laddu/opreators.js
@@ -12,25 +12,19 @@ export default function OperatorsDemo({ onLogMessage }) {
   const [compA, setCompA] = useState(20);
   const [compB, setCompB] = useState(40);
 
-  const [history, setHistory] = useState([]);
+  const [logicA, setLogicA] = useState(20);
+  const [logicB, setLogicB] = useState(40);
+
+  const [unaryA, setUnaryA] = useState(10);
+  const [ternaryA, setTernaryA] = useState(12);
+  const [ternaryB, setTernaryB] = useState(13);
+
+  // Quick Adder state (from index2.html / index.html2)
+  const [addBox1, setAddBox1] = useState(15);
+  const [addBox2, setAddBox2] = useState(25);
+  const [addResult, setAddResult] = useState(40);
+
   const [activeCategory, setActiveCategory] = useState('arithmetic');
-
-  // Load backend calculation history
-  const fetchHistory = async () => {
-    try {
-      const res = await fetch('/api/operators/history');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.history) setHistory(data.history);
-      }
-    } catch {
-      // Backend not running yet
-    }
-  };
-
-  useEffect(() => {
-    fetchHistory();
-  }, []);
 
   // Arithmetic calculations
   const numArithA = Number(arithA);
@@ -69,58 +63,60 @@ export default function OperatorsDemo({ onLogMessage }) {
     { op: '!==', name: 'Strict Not Equal', expr: `${compA} !== ${compB}`, val: compA !== compB },
   ];
 
-  const handleRunAllSourceTests = async () => {
-    onLogMessage('--- Running Full Suite from opreators.js ---');
-    arithmeticResults.forEach(r => onLogMessage(`Arithmetic: ${r.expr} = ${r.val}`));
-    assignmentResults.forEach(r => onLogMessage(`Assignment: ${r.expr} -> Result: ${r.val}`));
-    comparisonResults.forEach(r => onLogMessage(`Comparison: ${r.expr} -> Result: ${r.val}`));
+  // Logical calculations
+  const numLogicA = Number(logicA);
+  const numLogicB = Number(logicB);
+  const logicalResults = [
+    { expr: `(${numLogicA} < 0 && ${numLogicB} < 0)`, val: numLogicA < 0 && numLogicB < 0 },
+    { expr: `(${numLogicA} < 0 || ${numLogicB} < 0)`, val: numLogicA < 0 || numLogicB < 0 },
+    { expr: `!(${numLogicA} < 0)`, val: !(numLogicA < 0) },
+    { expr: `(${numLogicA} > 0 && ${numLogicB} > 0)`, val: numLogicA > 0 && numLogicB > 0 },
+    { expr: `(${numLogicA} > 0 || ${numLogicB} > 0)`, val: numLogicA > 0 || numLogicB > 0 },
+    { expr: `!(${numLogicA} > 0)`, val: !(numLogicA > 0) },
+  ];
 
-    // Save batch demo to backend
-    try {
-      await fetch('/api/operators/history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          category: 'batch_demo',
-          operandA: 30,
-          operandB: 38,
-          operator: 'FULL_SUITE',
-          result: 'All 16 operator checks executed successfully',
-          expression: 'Source suite run (laddu/opreators.js)',
-        }),
-      });
-      fetchHistory();
-    } catch {
-      // Backend not connected
-    }
+  const handleQuickAdd = () => {
+    const total = Number(addBox1) + Number(addBox2);
+    setAddResult(total);
+    onLogMessage(`[Quick Calculator (index2.html)] ${addBox1} + ${addBox2} = ${total}`);
+  };
+
+  const handleRunAllSourceTests = () => {
+    onLogMessage('--- Running Full Suite from opreators.js ---');
+    arithmeticResults.forEach((r) => onLogMessage(`Arithmetic: ${r.expr} = ${r.val}`));
+    assignmentResults.forEach((r) => onLogMessage(`Assignment: ${r.expr} -> Result: ${r.val}`));
+    comparisonResults.forEach((r) => onLogMessage(`Comparison: ${r.expr} -> Result: ${r.val}`));
+    logicalResults.forEach((r) => onLogMessage(`Logical: ${r.expr} -> ${r.val}`));
+    onLogMessage(`Unary: initial=${unaryA}, a++=${unaryA}, --a=${unaryA}`);
+    onLogMessage(`Ternary: (${ternaryA} > ${ternaryB}) ? "a is greater " : "b is greater" -> ${ternaryA > ternaryB ? 'a is greater ' : 'b is greater'}`);
   };
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            className={`tab-btn ${activeCategory === 'arithmetic' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('arithmetic')}
-          >
-            Arithmetic Operators
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button className={`tab-btn ${activeCategory === 'arithmetic' ? 'active' : ''}`} onClick={() => setActiveCategory('arithmetic')}>
+            Arithmetic
           </button>
-          <button
-            className={`tab-btn ${activeCategory === 'assignment' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('assignment')}
-          >
-            Assignment Operators
+          <button className={`tab-btn ${activeCategory === 'assignment' ? 'active' : ''}`} onClick={() => setActiveCategory('assignment')}>
+            Assignment
           </button>
-          <button
-            className={`tab-btn ${activeCategory === 'comparison' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('comparison')}
-          >
-            Comparison Operators
+          <button className={`tab-btn ${activeCategory === 'comparison' ? 'active' : ''}`} onClick={() => setActiveCategory('comparison')}>
+            Comparison
+          </button>
+          <button className={`tab-btn ${activeCategory === 'logical' ? 'active' : ''}`} onClick={() => setActiveCategory('logical')}>
+            Logical
+          </button>
+          <button className={`tab-btn ${activeCategory === 'unary_ternary' ? 'active' : ''}`} onClick={() => setActiveCategory('unary_ternary')}>
+            Unary & Ternary
+          </button>
+          <button className={`tab-btn ${activeCategory === 'quick_adder' ? 'active' : ''}`} onClick={() => setActiveCategory('quick_adder')}>
+            DOM Quick Adder (index2.html)
           </button>
         </div>
 
         <button className="btn btn-primary" onClick={handleRunAllSourceTests}>
-          <Play size={16} /> Run Full Source Suite (Console Logs)
+          <Play size={16} /> Run Full Suite
         </button>
       </div>
 
@@ -129,68 +125,37 @@ export default function OperatorsDemo({ onLogMessage }) {
         <div className="grid-2">
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">
-                <Calculator size={20} color="#38bdf8" />
-                Arithmetic Operators (Source: <code>a=30, b=38</code>)
-              </h2>
+              <h2 className="card-title"><Calculator size={20} color="#38bdf8" /> Arithmetic Operators</h2>
               <span className="badge badge-info">+ - * / ** %</span>
             </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div className="form-group">
-                <label>Operand a (Source default: 30)</label>
-                <input
-                  type="number"
-                  className="input-field"
-                  value={arithA}
-                  onChange={(e) => setArithA(Number(e.target.value))}
-                />
+                <label>Operand a (Default: 30)</label>
+                <input type="number" className="input-field" value={arithA} onChange={(e) => setArithA(Number(e.target.value))} />
               </div>
               <div className="form-group">
-                <label>Operand b (Source default: 38)</label>
-                <input
-                  type="number"
-                  className="input-field"
-                  value={arithB}
-                  onChange={(e) => setArithB(Number(e.target.value))}
-                />
+                <label>Operand b (Default: 38)</label>
+                <input type="number" className="input-field" value={arithB} onChange={(e) => setArithB(Number(e.target.value))} />
               </div>
             </div>
-
             <div className="code-box">
-              /* Source code from laddu/opreators.js */<br />
-              var a = {arithA}<br />
-              var b = {arithB}<br />
-              console.log(a + b)&nbsp;&nbsp;// Addition<br />
-              console.log(a - b)&nbsp;&nbsp;// Subtraction<br />
-              console.log(a * b)&nbsp;&nbsp;// Multiplication<br />
-              console.log(a / b)&nbsp;&nbsp;// Division<br />
-              console.log(a ** b)&nbsp;// Exponentiation<br />
-              console.log(a % b)&nbsp;&nbsp;// Modulus
+              var a = {arithA};<br />
+              var b = {arithB};<br />
+              console.log(a + b); // {numArithA + numArithB}<br />
+              console.log(a - b); // {numArithA - numArithB}<br />
+              console.log(a * b); // {numArithA * numArithB}
             </div>
           </div>
-
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">Live Computation Results</h2>
-              <span className="badge badge-success">Evaluated</span>
+              <h2 className="card-title">Live Results</h2>
+              <span className="badge badge-success">Computed</span>
             </div>
-
             <table className="results-table">
-              <thead>
-                <tr>
-                  <th>Operation</th>
-                  <th>Expression</th>
-                  <th>Result</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Operation</th><th>Expression</th><th>Result</th></tr></thead>
               <tbody>
                 {arithmeticResults.map((item, idx) => (
-                  <tr key={idx}>
-                    <td><code>{item.op}</code> ({item.name})</td>
-                    <td><code>{item.expr}</code></td>
-                    <td><span className="result-val result-num">{item.val}</span></td>
-                  </tr>
+                  <tr key={idx}><td><code>{item.op}</code></td><td><code>{item.expr}</code></td><td><span className="result-val result-num">{item.val}</span></td></tr>
                 ))}
               </tbody>
             </table>
@@ -203,66 +168,37 @@ export default function OperatorsDemo({ onLogMessage }) {
         <div className="grid-2">
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">
-                <Calculator size={20} color="#a855f7" />
-                Assignment Operators (Source: <code>a=20, b=39</code>)
-              </h2>
+              <h2 className="card-title"><Calculator size={20} color="#a855f7" /> Assignment Operators</h2>
               <span className="badge badge-info">+= -= *= /=</span>
             </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div className="form-group">
-                <label>Initial a (Source default: 20)</label>
-                <input
-                  type="number"
-                  className="input-field"
-                  value={assignA}
-                  onChange={(e) => setAssignA(Number(e.target.value))}
-                />
+                <label>Initial a (Default: 20)</label>
+                <input type="number" className="input-field" value={assignA} onChange={(e) => setAssignA(Number(e.target.value))} />
               </div>
               <div className="form-group">
-                <label>Operand b (Source default: 39)</label>
-                <input
-                  type="number"
-                  className="input-field"
-                  value={assignB}
-                  onChange={(e) => setAssignB(Number(e.target.value))}
-                />
+                <label>Operand b (Default: 39)</label>
+                <input type="number" className="input-field" value={assignB} onChange={(e) => setAssignB(Number(e.target.value))} />
               </div>
             </div>
-
             <div className="code-box">
-              /* Source code from laddu/opreators.js */<br />
-              var a = {assignA}<br />
-              var b = {assignB}<br />
-              console.log(a += b)&nbsp;// Addition Assignment<br />
-              console.log(a -= b)&nbsp;// Subtraction Assignment<br />
-              console.log(a *= b)&nbsp;// Multiplication Assignment<br />
-              console.log(a /= b)&nbsp;// Division Assignment
+              var a = {assignA};<br />
+              var b = {assignB};<br />
+              a += b; // {tempA1}<br />
+              a -= b; // {tempA2}<br />
+              a *= b; // {tempA3}
             </div>
           </div>
-
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">Assignment Results</h2>
-              <span className="badge badge-success">Evaluated</span>
+              <h2 className="card-title">Assignment Steps</h2>
+              <span className="badge badge-success">Computed</span>
             </div>
-
             <table className="results-table">
-              <thead>
-                <tr>
-                  <th>Operator</th>
-                  <th>Step Expression</th>
-                  <th>Resulting a</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Operator</th><th>Step Expression</th><th>Result</th></tr></thead>
               <tbody>
                 {assignmentResults.map((item, idx) => (
-                  <tr key={idx}>
-                    <td><code>{item.op}</code></td>
-                    <td><code>{item.expr}</code></td>
-                    <td><span className="result-val result-num">{item.val}</span></td>
-                  </tr>
+                  <tr key={idx}><td><code>{item.op}</code></td><td><code>{item.expr}</code></td><td><span className="result-val result-num">{item.val}</span></td></tr>
                 ))}
               </tbody>
             </table>
@@ -275,73 +211,127 @@ export default function OperatorsDemo({ onLogMessage }) {
         <div className="grid-2">
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">
-                <Calculator size={20} color="#10b981" />
-                Comparison Operators (Source: <code>a=20, b=40</code>)
-              </h2>
-              <span className="badge badge-info">== &lt;= &gt;= !=</span>
+              <h2 className="card-title"><Calculator size={20} color="#10b981" /> Comparison Operators</h2>
+              <span className="badge badge-info">== &lt;= &gt;= != === !==</span>
             </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div className="form-group">
-                <label>Value a (Source default: 20)</label>
-                <input
-                  type="text"
-                  className="input-field"
-                  value={compA}
-                  onChange={(e) => setCompA(e.target.value)}
-                />
+                <label>Value a (Default: 20)</label>
+                <input type="text" className="input-field" value={compA} onChange={(e) => setCompA(e.target.value)} />
               </div>
               <div className="form-group">
-                <label>Value b (Source default: 40)</label>
-                <input
-                  type="text"
-                  className="input-field"
-                  value={compB}
-                  onChange={(e) => setCompB(e.target.value)}
-                />
+                <label>Value b (Default: 40)</label>
+                <input type="text" className="input-field" value={compB} onChange={(e) => setCompB(e.target.value)} />
               </div>
             </div>
-
             <div className="code-box">
-              /* Source code from laddu/opreators.js */<br />
-              var a = {compA}<br />
-              var b = {compB}<br />
-              console.log(a == b)&nbsp;&nbsp;// Equality<br />
-              console.log(a &lt;= b)&nbsp;&nbsp;// Less than or equal<br />
-              console.log(a &gt;= b)&nbsp;&nbsp;// Greater than or equal<br />
-              console.log(a != b)&nbsp;&nbsp;// Inequality
+              var a = {compA}; var b = {compB};<br />
+              console.log(a == b); // {String(compA == compB)}<br />
+              console.log(a &lt;= b); // {String(compA <= compB)}<br />
+              console.log(a != b); // {String(compA != compB)}
             </div>
           </div>
-
           <div className="card">
-            <div className="card-header">
-              <h2 className="card-title">Boolean Evaluation</h2>
-              <span className="badge badge-success">Evaluated</span>
-            </div>
-
+            <div className="card-header"><h2 className="card-title">Boolean Outputs</h2><span className="badge badge-success">Evaluated</span></div>
             <table className="results-table">
-              <thead>
-                <tr>
-                  <th>Comparison</th>
-                  <th>Evaluation</th>
-                  <th>Boolean Result</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Comparison</th><th>Expression</th><th>Boolean</th></tr></thead>
               <tbody>
                 {comparisonResults.map((item, idx) => (
-                  <tr key={idx}>
-                    <td><code>{item.op}</code> ({item.name})</td>
-                    <td><code>{item.expr}</code></td>
-                    <td>
-                      <span className={`result-val ${item.val ? 'result-true' : 'result-false'}`}>
-                        {String(item.val)}
-                      </span>
-                    </td>
-                  </tr>
+                  <tr key={idx}><td><code>{item.op}</code></td><td><code>{item.expr}</code></td><td><span className={`result-val ${item.val ? 'result-true' : 'result-false'}`}>{String(item.val)}</span></td></tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* LOGICAL SECTION */}
+      {activeCategory === 'logical' && (
+        <div className="grid-2">
+          <div className="card">
+            <div className="card-header">
+              <h2 className="card-title"><Zap size={20} color="#f59e0b" /> Logical Operators</h2>
+              <span className="badge badge-info">&amp;&amp; || !</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div className="form-group">
+                <label>Value a</label>
+                <input type="number" className="input-field" value={logicA} onChange={(e) => setLogicA(Number(e.target.value))} />
+              </div>
+              <div className="form-group">
+                <label>Value b</label>
+                <input type="number" className="input-field" value={logicB} onChange={(e) => setLogicB(Number(e.target.value))} />
+              </div>
+            </div>
+            <div className="code-box">
+              console.log(a &gt; 0 &amp;&amp; b &gt; 0); // {String(numLogicA > 0 && numLogicB > 0)}<br />
+              console.log(a &lt; 0 || b &lt; 0); // {String(numLogicA < 0 || numLogicB < 0)}<br />
+              console.log(!(a &gt; 0)); // {String(!(numLogicA > 0))}
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-header"><h2 className="card-title">Logical Results</h2><span className="badge badge-success">Evaluated</span></div>
+            <table className="results-table">
+              <thead><tr><th>Expression</th><th>Result</th></tr></thead>
+              <tbody>
+                {logicalResults.map((item, idx) => (
+                  <tr key={idx}><td><code>{item.expr}</code></td><td><span className={`result-val ${item.val ? 'result-true' : 'result-false'}`}>{String(item.val)}</span></td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* UNARY & TERNARY */}
+      {activeCategory === 'unary_ternary' && (
+        <div className="grid-2">
+          <div className="card">
+            <div className="card-header"><h2 className="card-title">Unary Operators</h2><span className="badge badge-info">a++ a-- ++a --a</span></div>
+            <div className="form-group">
+              <label>Initial a (Default: 10)</label>
+              <input type="number" className="input-field" value={unaryA} onChange={(e) => setUnaryA(Number(e.target.value))} />
+            </div>
+            <div className="code-box">
+              var a = {unaryA};<br />
+              console.log(a++); // returns {unaryA}, then becomes {unaryA + 1}<br />
+              console.log(--a); // decrements and returns {unaryA}
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-header"><h2 className="card-title">Ternary Operator</h2><span className="badge badge-info">condition ? expr1 : expr2</span></div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div className="form-group"><label>Value a</label><input type="number" className="input-field" value={ternaryA} onChange={(e) => setTernaryA(Number(e.target.value))} /></div>
+              <div className="form-group"><label>Value b</label><input type="number" className="input-field" value={ternaryB} onChange={(e) => setTernaryB(Number(e.target.value))} /></div>
+            </div>
+            <div className="code-box">
+              var result = ({ternaryA} &gt; {ternaryB}) ? "a is greater " : "b is greater";<br />
+              // Result: <span style={{ color: '#34d399' }}>"{ternaryA > ternaryB ? 'a is greater ' : 'b is greater'}"</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* QUICK ADDER (index2.html) */}
+      {activeCategory === 'quick_adder' && (
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title"><Plus size={20} color="#38bdf8" /> DOM Quick Input Calculator (from index2.html & index.html2)</h2>
+            <span className="badge badge-info">DOM Manipulation</span>
+          </div>
+          <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '1rem' }}>
+            Direct interactive implementation of the DOM number adder from <code>source_laddu/index2.html</code>:
+          </p>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
+            <input id="num1" type="number" className="input-field" style={{ width: '120px' }} value={addBox1} onChange={(e) => setAddBox1(Number(e.target.value))} placeholder="num1" />
+            <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>+</span>
+            <input id="num2" type="number" className="input-field" style={{ width: '120px' }} value={addBox2} onChange={(e) => setAddBox2(Number(e.target.value))} placeholder="num2" />
+            <button className="btn btn-primary" onClick={handleQuickAdd}>Add</button>
+          </div>
+          <div style={{ padding: '0.75rem 1rem', background: '#090d16', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <p id="result" style={{ fontSize: '1.125rem', fontWeight: 600, color: '#34d399' }}>
+              Result: {addResult}
+            </p>
           </div>
         </div>
       )}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promise Demo</title>
+  <style>
+    body { font-family: sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+    #output { padding: 1rem; background: #1e293b; border-radius: 6px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h2>Promise Example (promise.html)</h2>
+  <div id="output">Promise status: Pending (resolving in 3s)...</div>
+
+  <script>
+    const studentPromise = new Promise(function(resolve, reject) {
+      console.log("Inside Promise");
+      let success = true;
+
+      setTimeout(function() {
+        console.log("Inside setTimeout");
+        if (success) {
+          console.log("inside success");
+          resolve("student loaded successfully");
+        } else {
+          console.log("inside error");
+          reject("failure to load student");
+        }
+      }, 3000);
+    });
+
+    studentPromise
+      .then(function(result) {
+        console.log("inside then:", result);
+        document.getElementById("output").textContent = "Promise Resolved: " + result;
+      })
+      .catch(function(error) {
+        console.log("inside catch:", error);
+        document.getElementById("output").textContent = "Promise Rejected: " + error;
+      });
+  </script>
+</body>
+</html>

@@ -1,18 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laddu Legacy Demo (Fixed)</title>
-    <style>
-      body { font-family: sans-serif; padding: 2rem; background: #0f172a; color: #f8fafc; }
-      pre { background: #1e293b; padding: 1rem; border-radius: 6px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laddu Standalone Demos (Preserved & Fixed)</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; max-width: 800px; margin: 0 auto; }
+    h1 { color: #38bdf8; font-size: 1.75rem; margin-bottom: 0.5rem; }
+    p { color: #94a3b8; margin-bottom: 1.5rem; }
+    ul { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; }
+    li a { display: block; padding: 0.875rem 1rem; background: #1e293b; color: #f8fafc; text-decoration: none; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); transition: background 0.2s; font-weight: 500; font-size: 0.875rem; }
+    li a:hover { background: #334155; border-color: #38bdf8; }
+  </style>
 </head>
 <body>
-    <h1>Laddu Legacy Demo (Standalone)</h1>
-    <p>Open developer console (F12) to view outputs of <code>variable.js</code> and <code>operators.js</code>.</p>
-    <script src="variable.js"></script>
-    <script src="operators.js"></script>
+  <h1>Laddu Legacy Demo Suite (Standalone)</h1>
+  <p>All original demo files preserved with syntax fixes and runnable directly in the browser:</p>
+  <ul>
+    <li><a href="index2.html">➕ index2.html (DOM Quick Adder)</a></li>
+    <li><a href="async-await.html">⏳ async-await.html (Async/Await)</a></li>
+    <li><a href="promise.html">🤝 promise.html (Promise Demo)</a></li>
+    <li><a href="callback.html">📞 callback.html (Callback Pattern)</a></li>
+    <li><a href="fech-app.html">🌐 fech-app.html (Fetch API)</a></li>
+    <li><a href="localstorage.html">💾 localstorage.html (LocalStorage)</a></li>
+  </ul>
 </body>
 </html>

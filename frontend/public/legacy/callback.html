@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Callback Demo</title>
+  <style>
+    body { font-family: sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+  </style>
+</head>
+<body>
+  <h2>Callback Example (callback.html)</h2>
+  <div id="output">Waiting for callback (3 seconds)...</div>
+
+  <script>
+    function fetchStudent(callback) {
+      setTimeout(function() {
+        let student = "Arun";
+        callback(student);
+      }, 3000);
+    }
+
+    function displaystudent(student) {
+      console.log("Callback received student:", student);
+      document.getElementById("output").textContent = "Callback Result: " + student;
+    }
+
+    fetchStudent(displaystudent);
+  </script>
+</body>
+</html>

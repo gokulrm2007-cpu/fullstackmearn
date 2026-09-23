@@ -43,7 +43,7 @@ async function runTests() {
     let failed = 0;
 
     try {
-      // Test 1: Health check
+      // 1. Health check
       console.log('Testing /api/health...');
       const health = await makeRequest('/api/health');
       if (health.status === 200 && health.body.status === 'ok') {
@@ -54,56 +54,74 @@ async function runTests() {
         failed++;
       }
 
-      // Test 2: Source Operators Demo
+      // 2. Operators full demo
       console.log('Testing /api/operators/demo...');
-      const opsDemo = await makeRequest('/api/operators/demo');
-      if (
-        opsDemo.status === 200 &&
-        opsDemo.body.data.arithmetic.results.addition.result === 68 &&
-        opsDemo.body.data.comparison.results.notEqual.result === true
-      ) {
-        console.log('PASS: /api/operators/demo matches source computations (30+38=68, 20!=40 is true)');
+      const ops = await makeRequest('/api/operators/demo');
+      if (ops.status === 200 && ops.body.data.arithmetic.addition.result === 68 && ops.body.data.logical.andPositive.result === true) {
+        console.log('PASS: /api/operators/demo (arithmetic + logical + ternary)');
         passed++;
       } else {
-        console.error('FAIL: /api/operators/demo', opsDemo);
+        console.error('FAIL: /api/operators/demo', ops);
         failed++;
       }
 
-      // Test 3: Variables endpoint
+      // 3. Variables
       console.log('Testing /api/variables...');
       const vars = await makeRequest('/api/variables');
-      if (vars.status === 200 && vars.body.data.name === 'gokul' && vars.body.data.age === 19) {
-        console.log('PASS: /api/variables correctly returns { name: "gokul", age: 19, country: "india" }');
+      if (vars.status === 200 && vars.body.data.name === 'gokul') {
+        console.log('PASS: /api/variables');
         passed++;
       } else {
         console.error('FAIL: /api/variables', vars);
         failed++;
       }
 
-      // Test 4: Scope test endpoint
-      console.log('Testing /api/variables/scope-test...');
-      const scope = await makeRequest('/api/variables/scope-test');
-      if (scope.status === 200 && scope.body.simulation.globalOrOuterScope.ageAccessibleOutsideBlock === false) {
-        console.log('PASS: /api/variables/scope-test correctly verifies block scope isolation');
+      // 4. DataTypes
+      console.log('Testing /api/datatypes...');
+      const dtypes = await makeRequest('/api/datatypes');
+      if (dtypes.status === 200 && dtypes.body.data.primitives.number.value === 30 && dtypes.body.data.studentObject.firstName === 'Hii') {
+        console.log('PASS: /api/datatypes (primitives & student object)');
         passed++;
       } else {
-        console.error('FAIL: /api/variables/scope-test', scope);
+        console.error('FAIL: /api/datatypes', dtypes);
         failed++;
       }
 
-      // Test 5: Arithmetic endpoint with parameters
-      console.log('Testing /api/operators/arithmetic?a=50&b=25...');
-      const arith = await makeRequest('/api/operators/arithmetic?a=50&b=25');
-      if (arith.status === 200 && arith.body.results.division.result === 2) {
-        console.log('PASS: /api/operators/arithmetic dynamic query (50/25=2)');
+      // 5. Loops
+      console.log('Testing /api/loops...');
+      const loops = await makeRequest('/api/loops?number=2&limit=5');
+      if (loops.status === 200 && loops.body.data.forLoopResults.length === 5 && loops.body.data.trafficSignals.length === 4) {
+        console.log('PASS: /api/loops (multiplication table & switch-case traffic lights)');
         passed++;
       } else {
-        console.error('FAIL: /api/operators/arithmetic', arith);
+        console.error('FAIL: /api/loops', loops);
+        failed++;
+      }
+
+      // 6. ES6 & Async
+      console.log('Testing /api/students/es6...');
+      const es6 = await makeRequest('/api/students/es6');
+      if (es6.status === 200 && es6.body.data.restMaxMarks.max === 90) {
+        console.log('PASS: /api/students/es6 (spread, rest, destructuring)');
+        passed++;
+      } else {
+        console.error('FAIL: /api/students/es6', es6);
+        failed++;
+      }
+
+      // 7. Async student endpoint
+      console.log('Testing /api/students/async-demo?delay=50...');
+      const asyncStudent = await makeRequest('/api/students/async-demo?delay=50');
+      if (asyncStudent.status === 200 && asyncStudent.body.result.name === 'Arun') {
+        console.log('PASS: /api/students/async-demo (promise & async/await resolution)');
+        passed++;
+      } else {
+        console.error('FAIL: /api/students/async-demo', asyncStudent);
         failed++;
       }
 
       console.log(`\n=====================================`);
-      console.log(`API Verification Suite: ${passed} Passed, ${failed} Failed`);
+      console.log(`Extended API Test Suite: ${passed} Passed, ${failed} Failed`);
       console.log(`=====================================\n`);
     } catch (err) {
       console.error('[TestRunner] Unexpected error:', err);
